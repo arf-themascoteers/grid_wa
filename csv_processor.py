@@ -84,8 +84,6 @@ class CSVProcessor:
                     if len(filter) == 0:
                         continue
 
-                    neighbours = pd.concat((neighbours,filter), axis=0)
-
                     if neighbours is None:
                         neighbours = filter
                     else:
