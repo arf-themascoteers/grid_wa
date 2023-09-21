@@ -69,7 +69,7 @@ class CSVProcessor:
             if scene_fusion:
                 the_scene = row["scene"]
 
-            neighbours = pd.DataFrame(columns=columns, data=[row])
+            neighbours = None
 
             for ro in row_offset:
                 for co in col_offset:
@@ -86,12 +86,19 @@ class CSVProcessor:
 
                     neighbours = pd.concat((neighbours,filter), axis=0)
 
+                    if neighbours is None:
+                        neighbours = filter
+                    else:
+                        neighbours = pd.concat((neighbours,filter), axis=0)
+
+
             new_row = {}
             for column in df.columns:
                 new_row[column] = row[column]
 
-            for band in S2Bands.get_all_bands():
-                new_row[band] = neighbours[band].mean()
+            if neighbours is not None:
+                for band in S2Bands.get_all_bands():
+                    new_row[band] = (neighbours[band].sum() + (new_row[band]*3)) / (len(neighbours)+3)
 
             df_dictionary = pd.DataFrame([new_row])
             dest = pd.concat([dest, df_dictionary], ignore_index=True)
